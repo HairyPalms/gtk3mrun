@@ -63,7 +63,16 @@ class Gmrun:
 				f.write(entry.get_text())
 				f.close()
 				Gtk.main_quit()
-			except: print("Bad Command")
+			except: 
+				#try with bash incase its a shell script
+				args.insert(0,"bash")
+				pid = Popen(args).pid
+				f = open(self.configfile, 'w')
+				for value in self.autocomplete:
+					f.write(value[0] + '\n')
+				f.write(entry.get_text())
+				f.close()
+				Gtk.main_quit()
 		elif event.keyval == 65307:
 			Gtk.main_quit()
 
