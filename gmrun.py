@@ -22,15 +22,23 @@ class Gmrun:
 		self.autocomplete = builder.get_object('autocompletemodel')
 		completion = builder.get_object('autocompletebuffer')
 
+		self.temparray = []
 		if os.path.exists(self.configfile):
 			f = open(self.configfile, 'r')
-			temparray = {}
 			for line in f:
-				temparray[line.strip()] = 1
+				self.temparray.append(line.strip())
 			f.close()
 
-			for key in temparray.iterkeys():
+			for key in self.temparray:
 				self.autocomplete.append([key])
+
+		usrbinarray = {}
+		for filename in os.listdir("/usr/bin"):
+			if os.path.isfile(os.path.join("/usr/bin",filename)):
+				usrbinarray[filename] = 1
+
+		for key in usrbinarray.iterkeys():
+			self.autocomplete.append([key])
 
 		completion.set_text_column(0)
 
@@ -58,7 +66,7 @@ class Gmrun:
 			try: 
 				pid = Popen(args).pid
 				f = open(self.configfile, 'w')
-				for value in self.autocomplete:
+				for value in self.temparray:
 					f.write(value[0] + '\n')
 				f.write(entry.get_text())
 				f.close()
@@ -68,7 +76,7 @@ class Gmrun:
 				args.insert(0,"bash")
 				pid = Popen(args).pid
 				f = open(self.configfile, 'w')
-				for value in self.autocomplete:
+				for value in self.temparray:
 					f.write(value[0] + '\n')
 				f.write(entry.get_text())
 				f.close()
@@ -77,16 +85,16 @@ class Gmrun:
 			Gtk.main_quit()
 
 	def up_pressed(self, entry):
-		if len(self.autocomplete) != 0:
-			if self.historyindex < len(self.autocomplete)-1:
+		if len(self.temparray) != 0:
+			if self.historyindex < len(self.temparray)-1:
 				self.historyindex = self.historyindex + 1
-			entry.set_text(self.autocomplete[self.historyindex][0])
+			entry.set_text(self.temparray[self.historyindex])
 
 	def down_pressed(self, entry):
-		if len(self.autocomplete) != 0:
+		if len(self.temparray) != 0:
 			if self.historyindex > 0:
 				self.historyindex = self.historyindex - 1
-			entry.set_text(self.autocomplete[self.historyindex][0])
+			entry.set_text(self.temparray[self.historyindex])
 
 	def area_draw(self, widget, cr):
 		cr.set_source_rgba(r,g,b,a)
@@ -94,6 +102,11 @@ class Gmrun:
 		cr.paint()
 		cr.set_operator(cairo.OPERATOR_OVER)
 
+import sys
+import fcntl
+LOCK_PATH = os.path.join(os.path.expanduser('~'), '.pygmrun3lock')
+fd = open(LOCK_PATH, 'w')
+fcntl.lockf(fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
 Gmrun()
 Gtk.main()
 
