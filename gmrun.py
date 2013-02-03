@@ -67,7 +67,7 @@ class Gmrun:
 				pid = Popen(args).pid
 				f = open(self.configfile, 'w')
 				for value in self.temparray:
-					f.write(value[0] + '\n')
+					f.write(value + '\n')
 				f.write(entry.get_text())
 				f.close()
 				Gtk.main_quit()
@@ -77,7 +77,7 @@ class Gmrun:
 				pid = Popen(args).pid
 				f = open(self.configfile, 'w')
 				for value in self.temparray:
-					f.write(value[0] + '\n')
+					f.write(value + '\n')
 				f.write(entry.get_text())
 				f.close()
 				Gtk.main_quit()
